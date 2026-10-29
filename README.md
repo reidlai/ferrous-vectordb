@@ -1,8 +1,8 @@
 # ferrous-vectordb
 
-[← Back to FerrousCX Root Architecture](https://github.com/reidlai/ferrouscx-bmad)
+[← Back to FerrousCX Root Architecture](https://github.com/reidlai/ferrous-cx)
 
-[![Component Type: Vector Database](https://img.shields.io/badge/component-Vector%20Database-blue.svg)](https://github.com/reidlai/ferrouscx-bmad)
+[![Component Type: Vector Database](https://img.shields.io/badge/component-Vector%20Database-blue.svg)](https://github.com/reidlai/ferrous-cx)
 [![Engine: Qdrant](https://img.shields.io/badge/engine-Qdrant%20(Pure%20Rust)-orange.svg)](https://qdrant.tech/)
 [![DevSecOps CI: Tier 2](https://img.shields.io/badge/DevSecOps%20CI-Tier%202%20Passing-brightgreen.svg)](.github/workflows/devsecops-infra-ci.yml)
 [![Pre-Commit Enabled](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](.pre-commit-config.yaml)
