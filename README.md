@@ -10,7 +10,7 @@
 **`ferrous-vectordb`** is the dedicated vector search and semantic retrieval submodule for the **FerrousCX** enterprise platform. Powered natively by **Qdrant**—an ultra-fast, memory-efficient vector similarity search engine written entirely in **pure Rust**—`ferrous-vectordb` acts as the enterprise semantic memory and RAG (Retrieval-Augmented Generation) knowledge layer for **`ferrous-agent` (`rig-core`)**.
 
 > **Note on Data Architecture Separation:**  
-> Operational and historical e-commerce transactional data (such as the Olist dataset) belongs strictly to the **streaming ingestion and lakehouse tier** (`stream-replay-rs` $\rightarrow$ `Apache Iggy` $\rightarrow$ `Arroyo Engine` $\rightarrow$ `ferrous-lakehouse` Delta Lake $\rightarrow$ `Apache DataFusion`).  
+> Operational and historical e-commerce transactional data (such as the Olist dataset) belongs strictly to the **streaming ingestion and lakehouse tier** (`stream-replay-rs` $\rightarrow$ `Apache Iggy` $\rightarrow$ `Arroyo Engine` $\rightarrow$ the Delta store in `ferrous-streaming` $\rightarrow$ `Apache DataFusion`).  
 > **`ferrous-vectordb` is exclusively dedicated to unstructured enterprise knowledge:** authoritative Standard Operating Procedures (SOPs), company policy guidelines, and historical customer service dialogue transcripts.
 
 ---
@@ -20,7 +20,7 @@
 A common question in conversational CX is: *How do vector collections actually help the AI Copilot answer user queries?*
 
 In FerrousCX, the AI Copilot (`ferrous-agent`) runs compiled Rust **`rig-core`**. When a support specialist (Carlos) investigates a customer issue, `rig-core` doesn't just guess or hallucinate—it uses a **two-pronged retrieval strategy**:
-1. **Relational Lakehouse Facts (Apache DataFusion in `ferrous-lakehouse`):** Fetches exact numbers, transit delays, and order statuses ingested via Arroyo (e.g. *Order #7a12b is 4 days late, freight cost was $18.50*).
+1. **Relational Lakehouse Facts (Apache DataFusion embedded in `ferrous-api`):** Fetches exact numbers, transit delays, and order statuses ingested via Arroyo (e.g. *Order #7a12b is 4 days late, freight cost was $18.50*).
 2. **Semantic Knowledge & Experience (Qdrant in `ferrous-vectordb`):** Fetches authoritative company policy SOPs and past human agent resolution transcripts.
 
 ### End-to-End Query Resolution Flow
@@ -31,7 +31,7 @@ sequenceDiagram
     actor Carlos as Support Specialist (Carlos)
     participant UI as Svelte 5 Workbench (ferrous-frontend)
     participant Agent as CX Copilot (rig-core in ferrous-agent)
-    participant DF as Apache DataFusion (ferrous-lakehouse)
+    participant DF as Apache DataFusion (in ferrous-api)
     participant Qdrant as Qdrant Vector DB (ferrous-vectordb)
     participant CQRS as ferrous-cqrses (Iggy WAL)
 
@@ -229,5 +229,5 @@ Open `http://localhost:6333/dashboard` in your browser to inspect collections (`
 ## 🛡️ DevSecOps & Quality Assurance (Tier 2 Infrastructure)
 
 - **Container Security:** Base Qdrant image scanned with `trivy` (0 HIGH/CRITICAL CVEs).
-- **Service Account M2M Access:** Token-based authentication using Kanidm service accounts (`svc_ferrous_api`, `svc_ferrous_query`).
+- **Service Account M2M Access:** Token-based authentication using Kanidm service accounts (`svc_ferrous_api`, `svc_ferrous_agent`).
 - **Data Persistence:** Vector indexes and payloads persist to dedicated Docker volumes with snapshot backup capabilities.
