@@ -1,0 +1,33 @@
+# ==============================================================================
+# FerrousCX Vector Database (Qdrant) Server Configuration
+# Adheres to Tier 2 DevSecOps standards and sub-5ms query latency baseline (AD-6, FR-13)
+# ==============================================================================
+
+service:
+  # Network interface binding and service ports
+  host: 0.0.0.0
+  http_port: 6333
+  grpc_port: 6334
+  enable_cors: true
+
+storage:
+  # Container persistent storage mounts
+  storage_path: /qdrant/storage
+  snapshots_path: /qdrant/snapshots
+  on_disk_payload: true
+  performance:
+    max_search_threads: 0
+  # Default HNSW graph indexing parameters tuned for sub-5ms latency
+  # Aligned with 384-dim sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+  hnsw_index:
+    m: 16
+    ef_construct: 100
+    full_scan_threshold: 10000
+    max_indexing_threads: 0
+    on_disk: false
+
+# Telemetry configuration (disabled for zero-crash air-gapped / enterprise compliance)
+telemetry_disabled: true
+
+logger:
+  log_level: INFO

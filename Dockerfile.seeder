@@ -1,0 +1,32 @@
+# syntax=docker/dockerfile:1.4
+# Hardened Knowledge Seeder Container for FerrousCX
+# Adheres strictly to Tier 2 DevSecOps standards (AD-13, NFR-10..13)
+
+FROM python:3.12-alpine
+
+LABEL org.opencontainers.image.title="ferrous-vectordb-seeder" \
+      org.opencontainers.image.description="Automated policy knowledge and transcript seeder for FerrousCX Qdrant" \
+      org.opencontainers.image.version="0.1.0" \
+      org.opencontainers.image.vendor="FerrousCX" \
+      org.opencontainers.image.licenses="Apache-2.0"
+
+# Create unprivileged non-root user and group (UID/GID 10001)
+RUN addgroup -g 10001 seeder && \
+    adduser -u 10001 -G seeder -s /sbin/nologin -D -H seeder && \
+    mkdir -p /app /app/scripts /app/data && \
+    chown -R 10001:10001 /app
+
+WORKDIR /app
+
+# Copy seeder script and datasets
+COPY --chown=10001:10001 scripts/seed-embeddings.py /app/scripts/seed-embeddings.py
+COPY --chown=10001:10001 data/ /app/data/
+
+# Switch to rootless runtime user (UID 10001)
+USER 10001:10001
+
+ENV PYTHONUNBUFFERED=1 \
+    QDRANT_HOST=http://vectordb:6333
+
+ENTRYPOINT ["python", "/app/scripts/seed-embeddings.py"]
+CMD []

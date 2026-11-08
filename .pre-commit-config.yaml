@@ -1,0 +1,43 @@
+# Pre-commit configuration for ferrous-vectordb
+# Enforces Tier 2 DevSecOps shift-left standards, Gitleaks, and vector DB configuration validation (AD-13, NFR-11).
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.4
+    hooks:
+      - id: gitleaks
+
+  - repo: local
+    hooks:
+      - id: test-collection-scaffolding
+        name: Validate Qdrant Collection Scaffolding
+        entry: python tests/test_collection_scaffolding.py
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: test-embedding-ingestion
+        name: Validate Dataset Ingestion & Embedding Seeding
+        entry: python tests/test_embedding_ingestion.py
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: test-submodule-standards
+        name: Validate Submodule Documentation & Tier 2 Security CI Gate
+        entry: python tests/test_submodule_standards.py
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: test-container-packaging
+        name: Validate Container Packaging & Knowledge Seeder Image
+        entry: python tests/test_container_packaging.py
+        language: system
+        pass_filenames: false
+        always_run: true
