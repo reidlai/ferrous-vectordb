@@ -1,0 +1,262 @@
+[
+  {
+    "dialogue_id": "abcd-001",
+    "scenario": "shipping_delay_compensation",
+    "intent": "request_courtesy_credit_for_delay",
+    "customer_id": "c928410294b",
+    "order_id": "7a12b4e892c451",
+    "turns": [
+      {
+        "speaker": "customer",
+        "text": "Hello, my order 7a12b4e892c451 was supposed to arrive four days ago and it is still stuck in São Paulo hub. Can someone help?"
+      },
+      {
+        "speaker": "agent",
+        "text": "Hello Aline, I apologize for the delay. Let me check the tracking details and logistics status for your package."
+      },
+      {
+        "speaker": "customer",
+        "text": "The carrier SLA was breached. Is there any courtesy credit or compensation for the delay?"
+      },
+      {
+        "speaker": "agent",
+        "text": "Yes, under Goodwill Policy §4.2, because the delivery delay exceeded 96 hours and you are a valued customer, you qualify for a full freight refund courtesy credit of R$ 29,80."
+      },
+      {
+        "speaker": "customer",
+        "text": "Thank you, that is very helpful. Please process that courtesy credit."
+      },
+      {
+        "speaker": "agent",
+        "text": "I have submitted the courtesy credit concession citing Goodwill Policy §4.2. You will see it credited to your account shortly."
+      }
+    ],
+    "transcript": "Customer: Hello, my order 7a12b4e892c451 was supposed to arrive four days ago and it is still stuck in São Paulo hub. Can someone help?\nAgent: Hello Aline, I apologize for the delay. Let me check the tracking details and logistics status for your package.\nCustomer: The carrier SLA was breached. Is there any courtesy credit or compensation for the delay?\nAgent: Yes, under Goodwill Policy §4.2, because the delivery delay exceeded 96 hours and you are a valued customer, you qualify for a full freight refund courtesy credit of R$ 29,80.\nCustomer: Thank you, that is very helpful. Please process that courtesy credit.\nAgent: I have submitted the courtesy credit concession citing Goodwill Policy §4.2. You will see it credited to your account shortly."
+  },
+  {
+    "dialogue_id": "abcd-002",
+    "scenario": "carrier_delay_escalation",
+    "intent": "track_delayed_shipment",
+    "customer_id": "cust-882194",
+    "order_id": "ord-992144",
+    "turns": [
+      {
+        "speaker": "customer",
+        "text": "Hi, I have not seen any tracking updates for order ord-992144 from Jadlog since Tuesday."
+      },
+      {
+        "speaker": "agent",
+        "text": "Let me investigate with our carrier liaison. It appears to be held at the Rio de Janeiro sorting facility."
+      },
+      {
+        "speaker": "customer",
+        "text": "Is the parcel lost or just delayed?"
+      },
+      {
+        "speaker": "agent",
+        "text": "We have opened a Tier 2 logistics trace with Jadlog per SOP-002. They have a 24-hour window to locate the parcel."
+      },
+      {
+        "speaker": "customer",
+        "text": "Okay, please notify me as soon as they respond."
+      },
+      {
+        "speaker": "agent",
+        "text": "Certainly, we will send an automated SMS and email update as soon as the tracer concludes."
+      }
+    ],
+    "transcript": "Customer: Hi, I have not seen any tracking updates for order ord-992144 from Jadlog since Tuesday.\nAgent: Let me investigate with our carrier liaison. It appears to be held at the Rio de Janeiro sorting facility.\nCustomer: Is the parcel lost or just delayed?\nAgent: We have opened a Tier 2 logistics trace with Jadlog per SOP-002. They have a 24-hour window to locate the parcel.\nCustomer: Okay, please notify me as soon as they respond.\nAgent: Certainly, we will send an automated SMS and email update as soon as the tracer concludes."
+  },
+  {
+    "dialogue_id": "abcd-003",
+    "scenario": "item_return_damaged",
+    "intent": "damaged_product_return",
+    "customer_id": "cust-331902",
+    "order_id": "ord-110482",
+    "turns": [
+      {
+        "speaker": "customer",
+        "text": "I opened my delivery today and the ceramic dish was shattered into pieces inside the box."
+      },
+      {
+        "speaker": "agent",
+        "text": "I am so sorry to hear that. Please provide photos of the packaging and broken items so we can initiate a claim."
+      },
+      {
+        "speaker": "customer",
+        "text": "I just uploaded three photos through the support chat portal."
+      },
+      {
+        "speaker": "agent",
+        "text": "Thank you. Under SOP-003 Section 3.1, since the damage was verified in transit, we will issue an immediate replacement without requiring you to return the fragments."
+      },
+      {
+        "speaker": "customer",
+        "text": "Great, I appreciate the quick resolution."
+      }
+    ],
+    "transcript": "Customer: I opened my delivery today and the ceramic dish was shattered into pieces inside the box.\nAgent: I am so sorry to hear that. Please provide photos of the packaging and broken items so we can initiate a claim.\nCustomer: I just uploaded three photos through the support chat portal.\nAgent: Thank you. Under SOP-003 Section 3.1, since the damage was verified in transit, we will issue an immediate replacement without requiring you to return the fragments.\nCustomer: Great, I appreciate the quick resolution."
+  },
+  {
+    "dialogue_id": "abcd-004",
+    "scenario": "courtesy_credit_inquiry",
+    "intent": "inquire_compensation_threshold",
+    "customer_id": "cust-441209",
+    "order_id": "ord-559123",
+    "turns": [
+      {
+        "speaker": "customer",
+        "text": "My package arrived two days late. Does your company provide any compensation for late deliveries?"
+      },
+      {
+        "speaker": "agent",
+        "text": "Under our carrier SLA courtesy credit guidelines (SOP-001), deliveries delayed by more than 48 hours qualify for shipping fee concessions."
+      },
+      {
+        "speaker": "customer",
+        "text": "How much courtesy credit can be granted?"
+      },
+      {
+        "speaker": "agent",
+        "text": "Depending on delay severity, standard compensation ranges from freight refund to up to $20.00 courtesy credit voucher."
+      },
+      {
+        "speaker": "customer",
+        "text": "That is fair. Can you apply the shipping refund to my account?"
+      },
+      {
+        "speaker": "agent",
+        "text": "I have processed a shipping fee credit of R$ 18,50 to your account under Goodwill Policy §4.2."
+      }
+    ],
+    "transcript": "Customer: My package arrived two days late. Does your company provide any compensation for late deliveries?\nAgent: Under our carrier SLA courtesy credit guidelines (SOP-001), deliveries delayed by more than 48 hours qualify for shipping fee concessions.\nCustomer: How much courtesy credit can be granted?\nAgent: Depending on delay severity, standard compensation ranges from freight refund to up to $20.00 courtesy credit voucher.\nCustomer: That is fair. Can you apply the shipping refund to my account?\nAgent: I have processed a shipping fee credit of R$ 18,50 to your account under Goodwill Policy §4.2."
+  },
+  {
+    "dialogue_id": "abcd-005",
+    "scenario": "merchant_dispute_mediation",
+    "intent": "unresponsive_seller_dispute",
+    "customer_id": "cust-667812",
+    "order_id": "ord-772910",
+    "turns": [
+      {
+        "speaker": "customer",
+        "text": "The seller sent the wrong size shirt and is refusing to respond to my messages."
+      },
+      {
+        "speaker": "agent",
+        "text": "I understand your frustration. Our marketplace dispute mediation procedure (SOP-003 §3.2) provides sellers 48 hours to reply before we intervene."
+      },
+      {
+        "speaker": "customer",
+        "text": "It has already been 3 days since I first contacted the merchant."
+      },
+      {
+        "speaker": "agent",
+        "text": "Since the 48-hour response window has elapsed, I am authorizing an automatic return merchandise authorization and prepaid shipping label."
+      },
+      {
+        "speaker": "customer",
+        "text": "Thank you, where can I download the return label?"
+      },
+      {
+        "speaker": "agent",
+        "text": "The prepaid shipping label has been dispatched to your registered email address."
+      }
+    ],
+    "transcript": "Customer: The seller sent the wrong size shirt and is refusing to respond to my messages.\nAgent: I understand your frustration. Our marketplace dispute mediation procedure (SOP-003 §3.2) provides sellers 48 hours to reply before we intervene.\nCustomer: It has already been 3 days since I first contacted the merchant.\nAgent: Since the 48-hour response window has elapsed, I am authorizing an automatic return merchandise authorization and prepaid shipping label.\nCustomer: Thank you, where can I download the return label?\nAgent: The prepaid shipping label has been dispatched to your registered email address."
+  },
+  {
+    "dialogue_id": "abcd-006",
+    "scenario": "carrier_sla_breach",
+    "intent": "severe_delivery_delay_escalation",
+    "customer_id": "cust-102938",
+    "order_id": "ord-448201",
+    "turns": [
+      {
+        "speaker": "customer",
+        "text": "My package was promised for delivery 5 days ago. Loggi carrier status shows no movement."
+      },
+      {
+        "speaker": "agent",
+        "text": "A delay of 5 days represents an SLA breach exceeding 96 hours under SOP-001 Section 4.2."
+      },
+      {
+        "speaker": "customer",
+        "text": "What are my options? I need these items urgently."
+      },
+      {
+        "speaker": "agent",
+        "text": "We can dispatch an expedited priority replacement order today and issue a courtesy credit voucher for your shipping expenses under Goodwill Policy §4.2."
+      },
+      {
+        "speaker": "customer",
+        "text": "Yes please, expedite the replacement order immediately."
+      },
+      {
+        "speaker": "agent",
+        "text": "The replacement order has been queued with warehouse priority fulfillment, and R$ 25,00 courtesy credit has been posted to your balance."
+      }
+    ],
+    "transcript": "Customer: My package was promised for delivery 5 days ago. Loggi carrier status shows no movement.\nAgent: A delay of 5 days represents an SLA breach exceeding 96 hours under SOP-001 Section 4.2.\nCustomer: What are my options? I need these items urgently.\nAgent: We can dispatch an expedited priority replacement order today and issue a courtesy credit voucher for your shipping expenses under Goodwill Policy §4.2.\nCustomer: Yes please, expedite the replacement order immediately.\nAgent: The replacement order has been queued with warehouse priority fulfillment, and R$ 25,00 courtesy credit has been posted to your balance."
+  },
+  {
+    "dialogue_id": "abcd-007",
+    "scenario": "order_cancellation_inquiry",
+    "intent": "cancel_unshipped_order",
+    "customer_id": "cust-556123",
+    "order_id": "ord-339182",
+    "turns": [
+      {
+        "speaker": "customer",
+        "text": "Can I cancel my order ord-339182? I placed it an hour ago."
+      },
+      {
+        "speaker": "agent",
+        "text": "Checking order status... Yes, your order is currently in processing state and has not been packaged yet."
+      },
+      {
+        "speaker": "customer",
+        "text": "Please proceed with cancellation."
+      },
+      {
+        "speaker": "agent",
+        "text": "Your order has been canceled and a full refund has been initiated to your original payment method."
+      }
+    ],
+    "transcript": "Customer: Can I cancel my order ord-339182? I placed it an hour ago.\nAgent: Checking order status... Yes, your order is currently in processing state and has not been packaged yet.\nCustomer: Please proceed with cancellation.\nAgent: Your order has been canceled and a full refund has been initiated to your original payment method."
+  },
+  {
+    "dialogue_id": "abcd-008",
+    "scenario": "address_change_request",
+    "intent": "update_shipping_address",
+    "customer_id": "cust-991203",
+    "order_id": "ord-221049",
+    "turns": [
+      {
+        "speaker": "customer",
+        "text": "I moved to a new apartment, can I change the delivery address for my recent purchase?"
+      },
+      {
+        "speaker": "agent",
+        "text": "Let me check if the carrier manifest has already been generated."
+      },
+      {
+        "speaker": "customer",
+        "text": "It was ordered earlier this morning."
+      },
+      {
+        "speaker": "agent",
+        "text": "The label has not been printed yet. Please provide the new delivery address and CEP postal code."
+      },
+      {
+        "speaker": "customer",
+        "text": "Av. Paulista 1000, Bela Vista, São Paulo - SP, CEP 01310-100."
+      },
+      {
+        "speaker": "agent",
+        "text": "The shipping address has been updated successfully."
+      }
+    ],
+    "transcript": "Customer: I moved to a new apartment, can I change the delivery address for my recent purchase?\nAgent: Let me check if the carrier manifest has already been generated.\nCustomer: It was ordered earlier this morning.\nAgent: The label has not been printed yet. Please provide the new delivery address and CEP postal code.\nCustomer: Av. Paulista 1000, Bela Vista, São Paulo - SP, CEP 01310-100.\nAgent: The shipping address has been updated successfully."
+  }
+]

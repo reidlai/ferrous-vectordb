@@ -9,8 +9,10 @@
 /snapshots/
 *.snapshot
 
-# Data staging & raw files
-data/raw/
+# Data staging & raw files (allow packaged reference dialogues)
+data/raw/*
+!data/raw/abcd/
+!data/raw/abcd/abcd_dialogues.json
 data/processed/
 
 # Python artifacts
