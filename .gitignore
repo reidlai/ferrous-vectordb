@@ -1,0 +1,56 @@
+# Environment & Secrets (DevSecOps Secret Zero)
+.env
+.env.*
+!.env.example
+
+# Qdrant Persistent Storage & Snapshots
+/qdrant_storage/
+/storage/
+/snapshots/
+*.snapshot
+
+# Data staging & raw files
+data/raw/
+data/processed/
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Editor & OS Artifacts
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
