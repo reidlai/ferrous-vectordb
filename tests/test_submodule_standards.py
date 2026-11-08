@@ -58,6 +58,7 @@ class SubmoduleStandardsUnitTests(unittest.TestCase):
             "test-collection-scaffolding",
             "test-embedding-ingestion",
             "test-submodule-standards",
+            "test-container-packaging",
         ]
         for expected_id in expected_hooks:
             self.assertIn(

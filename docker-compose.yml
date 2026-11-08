@@ -1,5 +1,5 @@
 # ==============================================================================
-# FerrousCX Vector Database (Qdrant) Standalone Docker Compose Manifest
+# FerrousCX Vector Database & Knowledge Seeder Standalone Docker Compose Manifest
 # Adheres strictly to Tier 2 DevSecOps standards (UID 10001 rootless, Day-0 hardening)
 # ==============================================================================
 
@@ -34,3 +34,21 @@ services:
     cap_drop:
       - ALL
     read_only: false
+
+  seeder:
+    build:
+      context: .
+      dockerfile: Dockerfile.seeder
+    image: ferrous-vectordb-seeder:latest
+    container_name: ferrous-vectordb-seeder
+    user: "10001:10001"
+    restart: "no"
+    environment:
+      - QDRANT_HOST=http://vectordb:6333
+    depends_on:
+      vectordb:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL

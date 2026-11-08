@@ -35,3 +35,9 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
+      - id: test-container-packaging
+        name: Validate Container Packaging & Knowledge Seeder Image
+        entry: python tests/test_container_packaging.py
+        language: system
+        pass_filenames: false
+        always_run: true

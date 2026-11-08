@@ -157,11 +157,36 @@ Qdrant hosts two dedicated collections indexed with **Cosine** distance and tune
 
 ---
 
+## 🐳 Dual Container Packaging & Orchestration (AD-6, AD-13, AD-23)
+
+`ferrous-vectordb` delivers two standardized, hardened OCI container images:
+
+| Target Image | Dockerfile | Base Image | Role & Invariants |
+| :--- | :--- | :--- | :--- |
+| **`ferrous-vectordb:latest`** | `Dockerfile` | `qdrant/qdrant:v1.12.0` | Pure-Rust vector database server with 384-dim Cosine metrics and HNSW index ($m=16$, $ef\_construct=128$), running as rootless user `UID 10001`, with `/readyz` healthcheck and persistent volumes at `/qdrant/storage`. |
+| **`ferrous-vectordb-seeder:latest`** | `Dockerfile.seeder` | `python:3.12-alpine` | Minimal hardened CLI seeder running as rootless user `UID 10001`. Packages enterprise SOPs (`data/sops`), ABCD dialogues (`data/raw/abcd`), and `seed-embeddings.py`. Automatically bootstraps collections and executes idempotent upserts. |
+
+### Docker Compose Multi-Service Topology
+
+`docker-compose.yml` orchestrates both services with health probe dependencies:
+* `vectordb`: exposes `6333`/`6334`, mounts persistent storage, and probes readiness via `GET /readyz`.
+* `seeder`: waits for `vectordb` health (`condition: service_healthy`), bootstraps collections if missing, seeds 22 SOP and 8 ABCD transcript points, verifies sub-5ms semantic search, and exits cleanly.
+
+```bash
+# Launch Qdrant and execute knowledge seeder automatically
+docker compose up -d
+
+# Verify seeder dry-run point generation in container
+docker run --rm ferrous-vectordb-seeder:latest --dry-run
+```
+
+---
+
 ## 🚀 Standalone Developer Quickstart (< 3 Minutes)
 
 Developers can spin up and verify `ferrous-vectordb` locally in under 3 minutes without cloud dependencies:
 
-### 1. Launch Qdrant Container (Hardened Rootless)
+### 1. Launch Qdrant & Knowledge Seeder (Turnkey Orchestration)
 ```bash
 docker compose up -d
 # Alternatively: docker run -d --name ferrous-vectordb -p 6333:6333 -p 6334:6334 ferrous-vectordb:latest
@@ -173,7 +198,7 @@ curl -f http://localhost:6333/readyz
 # Expected output: all health checks return HTTP 200 OK
 ```
 
-### 3. Initialize Collections (< 5 seconds)
+### 3. Initialize Collections (Optional / Manual Bootstrapping) (< 5 seconds)
 ```powershell
 # PowerShell (Windows)
 powershell -File scripts/create-collections.ps1
@@ -191,17 +216,17 @@ python scripts/seed-embeddings.py
 
 ### 5. Run DevSecOps Local Audit & Build (< 30 seconds)
 ```powershell
-# PowerShell (Windows)
+# PowerShell (Windows) - Audits Dockerfile & Dockerfile.seeder, builds and Trivy-scans both images
 powershell -File scripts/build-and-scan.ps1 -DryRun
 
-# POSIX (Linux / macOS)
+# POSIX (Linux / macOS) - Audits Dockerfile & Dockerfile.seeder, builds and Trivy-scans both images
 bash scripts/build-and-scan.sh --dry-run
 ```
 
 ### 6. Execute Automated Unit Tests (< 10 seconds)
 ```bash
 python -m unittest discover -s tests -p "test_*.py"
-# Verifies collection scaffolding, dataset ingestion, sub-5ms query latency, and submodule standards
+# Verifies collection scaffolding, dataset ingestion, sub-5ms query latency, container packaging, and submodule standards
 ```
 
 ---
@@ -215,6 +240,6 @@ python -m unittest discover -s tests -p "test_*.py"
 2. **Shift-Left Pre-Commit Hygiene:**  
    Managed by `.pre-commit-config.yaml` with Gitleaks secret scanning, YAML format validation, trailing whitespace cleanup, and automated test hooks.
 3. **Dual-Shell DevSecOps Automation:**  
-   Cross-platform scripts (`scripts/build-and-scan.ps1` and `scripts/build-and-scan.sh`) run `hadolint` Dockerfile audits and `trivy` container image vulnerability scans (`--severity HIGH,CRITICAL --ignore-unfixed --exit-code 1`), enforcing **0 Dockerfile warnings** and **0 HIGH/CRITICAL CVEs**.
+   Cross-platform scripts (`scripts/build-and-scan.ps1` and `scripts/build-and-scan.sh`) run `hadolint` Dockerfile audits and `trivy` container image vulnerability scans (`--severity HIGH,CRITICAL --ignore-unfixed --exit-code 1`) across both `ferrous-vectordb:latest` and `ferrous-vectordb-seeder:latest`, enforcing **0 Dockerfile warnings** and **0 HIGH/CRITICAL CVEs**.
 4. **Rootless Hardened Runtime:**  
-   Docker container executes as unprivileged user `UID 10001` (`USER 10001:10001`) with dropped Linux capabilities and persistent volumes at `/qdrant/storage`.
+   Both Docker containers execute as unprivileged user `UID 10001` (`USER 10001:10001`) with dropped Linux capabilities, with Qdrant maintaining persistent vector storage at `/qdrant/storage`.

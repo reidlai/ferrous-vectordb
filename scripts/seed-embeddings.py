@@ -326,6 +326,51 @@ class QdrantRestClient:
                 return False
             raise
 
+    def create_collection(
+        self,
+        name: str,
+        vector_size: int = 384,
+        distance: str = "Cosine",
+        hnsw_config: dict = None,
+    ) -> bool:
+        """Bootstraps a collection with given vector size, distance metric, and tuned HNSW index."""
+        payload = {
+            "vectors": {
+                "size": vector_size,
+                "distance": distance,
+            },
+            "hnsw_config": hnsw_config or {
+                "m": 16,
+                "ef_construct": 128,
+                "full_scan_threshold": 10000,
+            },
+        }
+        res = self._request(f"/collections/{name}", method="PUT", data=payload)
+        return res.get("result", False) is True or res.get("status") == "ok"
+
+    def ensure_collection(
+        self,
+        name: str,
+        vector_size: int = 384,
+        distance: str = "Cosine",
+        hnsw_config: dict = None,
+    ) -> bool:
+        """Ensures that a collection exists, creating it idempotently if missing."""
+        if self.check_collection(name):
+            return True
+        try:
+            created = self.create_collection(
+                name,
+                vector_size=vector_size,
+                distance=distance,
+                hnsw_config=hnsw_config,
+            )
+            if created:
+                return True
+        except Exception:
+            pass
+        return self.check_collection(name)
+
     def upsert_points(self, collection_name: str, points: list, batch_size: int = 64) -> int:
         total = 0
         for i in range(0, len(points), batch_size):
@@ -437,11 +482,12 @@ def main():
         print("Please start the container via 'docker compose up -d' or verify network connectivity.", file=sys.stderr)
         sys.exit(1)
 
-    print("[INFO] Connected to Qdrant. Checking collections...")
+    print("[INFO] Connected to Qdrant. Ensuring collections exist (bootstrapping if missing)...")
     for col in ["cx_policy_knowledge", "support_transcripts"]:
-        if not client.check_collection(col):
-            print(f"[ERROR] Collection '{col}' does not exist. Run scripts/create-collections.ps1 or .sh first.", file=sys.stderr)
+        if not client.ensure_collection(col):
+            print(f"[ERROR] Failed to ensure collection '{col}' exists.", file=sys.stderr)
             sys.exit(1)
+        print(f"[INFO] Collection '{col}' verified present.")
 
     # Upsert SOP points
     print(f"[INFO] Upserting {len(sop_points)} points to collection 'cx_policy_knowledge'...")
