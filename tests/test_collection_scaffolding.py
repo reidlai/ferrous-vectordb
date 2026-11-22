@@ -45,7 +45,7 @@ class TestConfigYaml(unittest.TestCase):
         hnsw = storage.get("hnsw_index", {})
         self.assertEqual(hnsw.get("m"), 16)
         self.assertEqual(hnsw.get("ef_construct"), 100)
-        self.assertEqual(hnsw.get("full_scan_threshold"), 10000)
+        self.assertEqual(hnsw.get("full_scan_threshold_kb"), 10000)
 
     def test_telemetry_disabled(self):
         self.assertTrue(self.config.get("telemetry_disabled"))
