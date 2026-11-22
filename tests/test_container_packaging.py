@@ -274,7 +274,7 @@ class ContainerPackagingUnitTests(unittest.TestCase):
             cwd=str(REPO_ROOT),
         )
         self.assertEqual(res.returncode, 0, f"Seeder dry-run failed:\n{res.stderr}\n{res.stdout}")
-        self.assertIn("22 SOP points", res.stdout)
+        self.assertIn("59 SOP points", res.stdout)
         self.assertIn("8 transcript points", res.stdout)
         self.assertIn("[SUCCESS] DRY-RUN completed successfully", res.stdout)
 

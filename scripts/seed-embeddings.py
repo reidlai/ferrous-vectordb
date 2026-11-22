@@ -63,6 +63,26 @@ SEMANTIC_CONCEPTS = {
         'keywords': ['dispute', 'resolution', 'chargeback', 'damaged', 'return', 'merchant', 'mediation', 'claim', 'investigation'],
         'min_match': 3
     },
+    'order_cancellation_sop4': {
+        'keywords': ['cancel', 'cancellation', 'invoiced', 'processing', 'shipped', 'intercept', 'rma', 'order_status', 'approved'],
+        'min_match': 3
+    },
+    'payment_refund_sla_sop5': {
+        'keywords': ['refund', 'payment_type', 'credit_card', 'boleto', 'voucher', 'debit_card', 'installments', 'billing', 'settlement'],
+        'min_match': 3
+    },
+    'multi_seller_split_sop6': {
+        'keywords': ['multi', 'seller', 'split', 'shipment', 'staggered', 'parcel', 'seller_id', 'order_item_id', 'missing'],
+        'min_match': 3
+    },
+    'category_return_warranty_sop7': {
+        'keywords': ['category', 'warranty', 'hygiene', 'health_beauty', 'electronics', 'computers_accessories', 'furniture_decor', 'cooling', 'bulky'],
+        'min_match': 3
+    },
+    'low_rating_recovery_sop8': {
+        'keywords': ['review_score', 'rating', 'stars', 'recovery', 'triage', 'escalation', 'churn', 'hitl', 'proactive'],
+        'min_match': 3
+    },
     'dialogue_conversation': {
         'keywords': ['customer', 'agent', 'hello', 'please', 'thank', 'help', 'inquiry', 'account'],
         'min_match': 2
@@ -206,6 +226,9 @@ def parse_sop_file(filepath: str) -> list:
             "title": title,
             "section": section_id,
             "filename": filename,
+            "doc_type": "sop",
+            "source_dataset": "ferrouscx_sops",
+            "license": "MIT-OR-Apache-2.0",
             "content": sec_text.strip()
         }
 
@@ -244,7 +267,10 @@ def parse_abcd_dialogues(filepath: str) -> list:
             "turn_count": len(d.get("turns", [])),
             "customer_id": d.get("customer_id", ""),
             "order_id": d.get("order_id", ""),
-            "intent": d.get("intent", "")
+            "intent": d.get("intent", ""),
+            "doc_type": "transcript",
+            "source_dataset": "asappresearch/abcd",
+            "license": "MIT"
         }
 
         points.append({
@@ -253,6 +279,126 @@ def parse_abcd_dialogues(filepath: str) -> list:
             "payload": payload
         })
 
+    return points
+
+
+def _load_json_or_jsonl(filepath: str) -> list:
+    """Loads either a JSON array/object file or a newline-delimited JSONL file."""
+    with open(filepath, "r", encoding="utf-8") as f:
+        raw = f.read().strip()
+    if not raw:
+        return []
+    if raw.startswith("[") or raw.startswith("{"):
+        parsed = json.loads(raw)
+        if isinstance(parsed, list):
+            return parsed
+        if isinstance(parsed, dict):
+            return [parsed]
+    return [json.loads(line) for line in raw.splitlines() if line.strip()]
+
+
+def parse_abcd_guidelines(filepath: str) -> list:
+    """Parses ABCD Agent Guidelines (asappresearch/abcd guidelines.json, MIT) into policy points."""
+    with open(filepath, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    points = []
+    items = []
+    if isinstance(data, dict):
+        for flow, subflows in data.items():
+            if isinstance(subflows, dict):
+                for subflow, body in subflows.items():
+                    text = "\n".join(body) if isinstance(body, list) else str(body)
+                    items.append((flow, subflow, text))
+            else:
+                text = "\n".join(subflows) if isinstance(subflows, list) else str(subflows)
+                items.append((flow, flow, text))
+    elif isinstance(data, list):
+        for idx, entry in enumerate(data):
+            flow = str(entry.get("flow", "general"))
+            subflow = str(entry.get("subflow", f"guideline_{idx}"))
+            text = str(entry.get("text", entry.get("guideline", "")))
+            items.append((flow, subflow, text))
+
+    for idx, (flow, subflow, text) in enumerate(items):
+        if not text.strip():
+            continue
+        enriched = f"[ABCD Guideline > {flow} > {subflow}] {text.strip()}"
+        point_id = str(uuid.uuid5(uuid.NAMESPACE_URL, f"ferrouscx:abcd-guideline:{flow}:{subflow}:{idx}"))
+        points.append({
+            "id": point_id,
+            "vector": generate_embedding(enriched, dim=384),
+            "payload": {
+                "sop_id": f"ABCD-{flow}",
+                "title": f"{flow}: {subflow}",
+                "section": subflow,
+                "filename": os.path.basename(filepath),
+                "intent": subflow,
+                "doc_type": "guideline",
+                "source_dataset": "asappresearch/abcd",
+                "license": "MIT",
+                "content": enriched,
+            },
+        })
+    return points
+
+
+def parse_bitext_qa(filepath: str) -> list:
+    """Parses Bitext Customer Support Q&A JSON/JSONL (CDLA-Sharing-1.0, zero-PII) into transcript points."""
+    rows = _load_json_or_jsonl(filepath)
+    points = []
+    for idx, row in enumerate(rows):
+        instruction = str(row.get("instruction", row.get("question", ""))).strip()
+        response = str(row.get("response", row.get("answer", ""))).strip()
+        if not instruction:
+            continue
+        intent = str(row.get("intent", "general_support"))
+        category = str(row.get("category", "ORDER"))
+        embed_text = f"[{category} / {intent}] Customer: {instruction}"
+        transcript = f"Customer: {instruction}\nAgent: {response}" if response else f"Customer: {instruction}"
+        point_id = str(uuid.uuid5(uuid.NAMESPACE_URL, f"ferrouscx:bitext:{idx}:{intent}:{instruction[:64]}"))
+        points.append({
+            "id": point_id,
+            "vector": generate_embedding(embed_text, dim=384),
+            "payload": {
+                "dialogue_id": f"bitext-{idx:06d}",
+                "scenario": category.lower(),
+                "intent": intent,
+                "transcript": transcript,
+                "turn_count": 2 if response else 1,
+                "doc_type": "qa_pair",
+                "source_dataset": "bitext/Bitext-customer-support-llm-chatbot-training-dataset",
+                "license": "CDLA-Sharing-1.0",
+            },
+        })
+    return points
+
+
+def parse_faq_dataset(filepath: str) -> list:
+    """Parses English e-commerce FAQ JSON/JSONL (e.g., MakTek/Customer_support_faqs_dataset, Apache-2.0)."""
+    rows = _load_json_or_jsonl(filepath)
+    points = []
+    for idx, row in enumerate(rows):
+        question = str(row.get("question", row.get("prompt", ""))).strip()
+        answer = str(row.get("answer", row.get("response", ""))).strip()
+        if not question:
+            continue
+        content = f"[FAQ] Q: {question}\nA: {answer}"
+        point_id = str(uuid.uuid5(uuid.NAMESPACE_URL, f"ferrouscx:faq:{idx}:{question[:64]}"))
+        points.append({
+            "id": point_id,
+            "vector": generate_embedding(question, dim=384),
+            "payload": {
+                "sop_id": f"FAQ-{idx:04d}",
+                "title": question,
+                "section": f"faq-{idx}",
+                "filename": os.path.basename(filepath),
+                "doc_type": "faq",
+                "source_dataset": "MakTek/Customer_support_faqs_dataset",
+                "license": "Apache-2.0",
+                "content": content,
+            },
+        })
     return points
 
 
@@ -371,6 +517,15 @@ class QdrantRestClient:
             pass
         return self.check_collection(name)
 
+    def create_payload_index(self, collection_name: str, field_name: str, field_schema: str = "keyword") -> bool:
+        """Creates an indexed payload field in Qdrant for fast pre-filtered semantic search."""
+        payload = {"field_name": field_name, "field_schema": field_schema}
+        try:
+            res = self._request(f"/collections/{collection_name}/index?wait=true", method="PUT", data=payload)
+            return res.get("status") == "ok"
+        except Exception:
+            return False
+
     def upsert_points(self, collection_name: str, points: list, batch_size: int = 64) -> int:
         total = 0
         for i in range(0, len(points), batch_size):
@@ -402,6 +557,9 @@ def main():
     parser.add_argument("--limit", type=int, default=None, help="Maximum number of points to ingest per collection")
     parser.add_argument("--sops-dir", default=None, help="Directory containing enterprise SOP markdown files")
     parser.add_argument("--transcripts-file", default=None, help="Path to ABCD dialogues JSON file")
+    parser.add_argument("--abcd-guidelines-file", default=None, help="Optional path to ABCD guidelines.json (MIT)")
+    parser.add_argument("--bitext-file", default=None, help="Optional path to Bitext Customer Support JSON/JSONL (CDLA-Sharing-1.0)")
+    parser.add_argument("--faqs-file", default=None, help="Optional path to English e-commerce FAQs JSON/JSONL (Apache-2.0)")
     parser.add_argument("--batch-size", type=int, default=64, help="Batch size for point upserts")
     parser.add_argument("--verify-search", action="store_true", default=True, help="Run semantic search validation query after seeding")
 
@@ -440,15 +598,30 @@ def main():
         points = parse_sop_file(sop_path)
         sop_points.extend(points)
 
+    if args.abcd_guidelines_file and os.path.isfile(args.abcd_guidelines_file):
+        guideline_pts = parse_abcd_guidelines(args.abcd_guidelines_file)
+        print(f"[INFO] Loaded {len(guideline_pts)} ABCD guideline points from {args.abcd_guidelines_file}")
+        sop_points.extend(guideline_pts)
+
+    if args.faqs_file and os.path.isfile(args.faqs_file):
+        faq_pts = parse_faq_dataset(args.faqs_file)
+        print(f"[INFO] Loaded {len(faq_pts)} FAQ points from {args.faqs_file}")
+        sop_points.extend(faq_pts)
+
     if args.limit and len(sop_points) > args.limit:
         sop_points = sop_points[: args.limit]
 
-    # 2. Load and parse ABCD transcripts
+    # 2. Load and parse ABCD transcripts (plus optional Bitext Q&A)
     if not os.path.isfile(transcripts_file):
         print(f"[ERROR] ABCD dialogues file not found: {transcripts_file}", file=sys.stderr)
         sys.exit(1)
 
     transcript_points = parse_abcd_dialogues(transcripts_file)
+    if args.bitext_file and os.path.isfile(args.bitext_file):
+        bitext_pts = parse_bitext_qa(args.bitext_file)
+        print(f"[INFO] Loaded {len(bitext_pts)} Bitext Q&A points from {args.bitext_file}")
+        transcript_points.extend(bitext_pts)
+
     if args.limit and len(transcript_points) > args.limit:
         transcript_points = transcript_points[: args.limit]
 
@@ -487,6 +660,8 @@ def main():
         if not client.ensure_collection(col):
             print(f"[ERROR] Failed to ensure collection '{col}' exists.", file=sys.stderr)
             sys.exit(1)
+        for idx_field in ["doc_type", "source_dataset", "license", "sop_id", "intent"]:
+            client.create_payload_index(col, idx_field, "keyword")
         print(f"[INFO] Collection '{col}' verified present.")
 
     # Upsert SOP points
